@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="PxUsage, HardcodedText"
+    android:background="@color/black"
+    tools:context=".NewPlaylistActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/rootLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="200px"
+            android:layout_marginTop="200px"
+            android:text="My Playlists"
+            android:fontFamily="@font/montserrat_bold"
+            android:textSize="130px"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+<!--        <FrameLayout-->
+<!--            android:layout_marginTop="50px"-->
+<!--            android:layout_width="800px"-->
+<!--            android:layout_height="500px"-->
+<!--            android:background="@drawable/stroke"-->
+<!--            android:paddingStart="30px">-->
+<!--            <TextView-->
+<!--                android:paddingTop="30px"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:fontFamily="@font/montserrat_bold"-->
+<!--                android:textSize="90px"-->
+<!--                android:singleLine="true"-->
+<!--                android:text="Playlist 12343232423323423423423423"/>-->
+<!--            <TextView-->
+<!--                android:layout_marginTop="150px"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:fontFamily="@font/montserrat_bold"-->
+<!--                android:textSize="80px"-->
+<!--                android:text="3 Songs"/>-->
+<!--            <ImageView-->
+<!--                android:layout_width="150px"-->
+<!--                android:layout_height="150px"-->
+<!--                android:src="@drawable/play1"-->
+<!--                android:layout_gravity="center|bottom"-->
+<!--                android:layout_marginBottom="50px"/>-->
+<!--        </FrameLayout>-->
+    </LinearLayout>
+    </ScrollView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
