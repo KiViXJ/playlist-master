@@ -53,6 +53,7 @@ class MyPlaylistsActivity : AppCompatActivity() {
         }
         imageContainer.layoutParams = FrameLayout.LayoutParams(match,wrap).apply {
             gravity = Gravity.CENTER or Gravity.BOTTOM
+            bottomMargin = 50
         }
 
 
@@ -83,7 +84,6 @@ class MyPlaylistsActivity : AppCompatActivity() {
         }
         playImage.layoutParams = FrameLayout.LayoutParams(150,150).apply {
             gravity = Gravity.BOTTOM or Gravity.CENTER
-            bottomMargin = 50
         }
 
         playImage.setOnClickListener {
@@ -91,14 +91,15 @@ class MyPlaylistsActivity : AppCompatActivity() {
                 Intent(this, PlaylistActivity::class.java).apply {
                     putExtra("playlist", playlist)
                     putExtra("audio", playlists[playlist]!!.toCollection(ArrayList())) }
-            )}
+            )
+        }
 
         val settingsImage = ImageView(this).apply {
             setImageDrawable(resources.getDrawable(R.drawable.settings))
         }
         settingsImage.layoutParams = FrameLayout.LayoutParams(150,150).apply {
             gravity = Gravity.BOTTOM or Gravity.CENTER
-            bottomMargin = 50
+            leftMargin = 50
         }
 
         settingsImage.setOnClickListener {
@@ -121,9 +122,6 @@ class MyPlaylistsActivity : AppCompatActivity() {
         findViewById<LinearLayout>(R.id.rootLayout).addView(container)
 
 
-    }
-    fun makeToast(msg: String) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
     fun loadPlaylists() {
