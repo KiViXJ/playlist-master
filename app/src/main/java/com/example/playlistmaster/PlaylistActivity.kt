@@ -97,7 +97,6 @@ class PlaylistActivity : AppCompatActivity() {
         if (mediaPlayer.playbackParams.speed != 0.25f) {
 
             val params = mediaPlayer.playbackParams
-            makeToast(params.speed.toString())
             params.speed = params.speed - 0.25f
             mediaPlayer.playbackParams = params
 
@@ -111,7 +110,6 @@ class PlaylistActivity : AppCompatActivity() {
         if (mediaPlayer.playbackParams.speed != 1.25f) {
 
             val params = mediaPlayer.playbackParams
-            makeToast(params.speed.toString())
             params.speed = params.speed + 0.25f
             mediaPlayer.playbackParams = params
 
