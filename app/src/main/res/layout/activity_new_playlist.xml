@@ -29,10 +29,21 @@
                 android:textSize="140px"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/saveButtonM"
+                android:layout_width="500px"
+                android:layout_height="200px"
+                android:background="@drawable/button"
+                android:text="Save"
+                android:textSize="90px"
+                android:layout_marginTop="150px"
+                android:fontFamily="@font/montserrat_bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <EditText
                 android:id="@+id/newPlaylistTitle"
-                android:layout_width="800px"
+                android:layout_width="700px"
                 android:layout_height="200px"
                 android:layout_marginTop="150px"
                 android:autofillHints="username"
@@ -89,17 +100,6 @@
         android:gravity="bottom|center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/newPlaylistReady"
-            android:layout_width="500px"
-            android:layout_height="200px"
-            android:background="@drawable/button"
-            android:text="Save"
-            android:textSize="90px"
-            android:fontFamily="@font/montserrat_bold"
-            android:layout_marginBottom="50px"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
