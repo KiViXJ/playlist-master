@@ -1,40 +1,41 @@
 package com.example.playlistmaster
 
-import android.annotation.SuppressLint
+
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Typeface
-import android.media.MediaPlayer
 import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.children
-import androidx.core.view.setPadding
-import androidx.transition.Visibility
 import java.io.File
-import java.lang.reflect.Array
 
 class MyPlaylistsActivity : AppCompatActivity() {
 
     private val playlists = mutableMapOf<File, List<File>>()
     val match = FrameLayout.LayoutParams.MATCH_PARENT; val wrap = FrameLayout.LayoutParams.WRAP_CONTENT
 
+    fun handleBackPress() {
+        fun callback() = startActivity(Intent(this, MainActivity::class.java))
+        if (SDK_INT >= 33) {
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT
+            ) {
+               callback()
+            }
+        }
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     fun createPlaylistView(playlist: File, songsCount: Int) {
 
@@ -89,8 +90,7 @@ class MyPlaylistsActivity : AppCompatActivity() {
             startActivity(
                 Intent(this, PlaylistActivity::class.java).apply {
                     putExtra("playlist", playlist)
-                    putExtra("audio", playlists[playlist]!!.toCollection(ArrayList()))
-        }
+                    putExtra("audio", playlists[playlist]!!.toCollection(ArrayList())) }
             )}
 
         val settingsImage = ImageView(this).apply {
@@ -102,15 +102,12 @@ class MyPlaylistsActivity : AppCompatActivity() {
         }
 
         settingsImage.setOnClickListener {
-            try {
-                startActivity(
-                    Intent(this, PlaylistSettingsActivity::class.java).apply {
-                        putExtra("playlist", playlist)
-                        putExtra("audio", playlists[playlist]!!.toCollection(ArrayList()))
-                    }
-                )
-            }
-            catch (e: Exception) { makeToast(e.toString()); makeToast(e.message.toString()) }
+            startActivity(
+                Intent(this, PlaylistSettingsActivity::class.java).apply {
+                    putExtra("playlist", playlist)
+                    putExtra("audio", playlists[playlist]!!.toCollection(ArrayList()))
+                }
+            )
         }
 
         imageContainer.addView(playImage)
@@ -135,11 +132,11 @@ class MyPlaylistsActivity : AppCompatActivity() {
         if (playlistDirectories.isNotEmpty()) {
             for (playlistDirectory in playlistDirectories) {
                 val playlistsAudio =
-                    playlistDirectory.listFiles()?.filter { it.isFile && it.canRead() } ?: emptyList()
+                    playlistDirectory.listFiles()?.filter { it.isFile && it.canRead() && !it.name.endsWith(".json") } ?: emptyList()
 
                 if (playlistsAudio.isNotEmpty()) {
                     playlists[playlistDirectory] =
-                        playlistsAudio.sortedBy { it.name } // Optional: sort files alphabetically.
+                        playlistsAudio.sortedBy { it.name }
                 }
             }
         }
@@ -147,31 +144,31 @@ class MyPlaylistsActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
-        try {
-            super.onCreate(savedInstanceState)
-            enableEdgeToEdge()
-            setContentView(R.layout.activity_my_playlists)
 
-            window.setFlags(
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-            )
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_my_playlists)
 
-            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-                val systemBars =
-                    insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-                insets
-            }
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
 
-            loadPlaylists()
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars =
+                insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
-            if (playlists.isNotEmpty()) {
-                for ((playlistFile, audioFiles) in playlists) {
-                    createPlaylistView(playlistFile, audioFiles.size)
-                }
+        handleBackPress()
+        loadPlaylists()
+
+        if (playlists.isNotEmpty()) {
+            for ((playlistFile, audioFiles) in playlists) {
+                createPlaylistView(playlistFile, audioFiles.size)
             }
         }
-        catch (e: Exception) { makeToast(e.message.toString()) }
     }
+
 }

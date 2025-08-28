@@ -1,6 +1,6 @@
 package com.example.playlistmaster
 
-import android.animation.ObjectAnimator
+
 import android.animation.ValueAnimator
 import android.content.Intent
 import android.graphics.Color
@@ -8,7 +8,6 @@ import android.graphics.PorterDuff
 import android.media.MediaPlayer
 import android.media.PlaybackParams
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -16,16 +15,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.io.File
-import java.util.ArrayList
-import kotlin.collections.count
-import kotlin.collections.get
-import kotlin.collections.listOf
-import kotlin.reflect.typeOf
 
 class PlaylistActivity : AppCompatActivity() {
 
@@ -41,44 +34,34 @@ class PlaylistActivity : AppCompatActivity() {
         }
         mediaPlayer.reset()
 
-        try {
+        val tryNextAudio = audio.getOrNull(1)
+        val nextSong = tryNextAudio?.nameWithoutExtension ?: "None"
+        mediaPlayer.setDataSource(audio[currentAudioIndex].absolutePath)
 
-            val tryNextAudio = audio.getOrNull(1)
-            val nextSong = tryNextAudio?.nameWithoutExtension ?: "None"
-            // Set data source to the first song in the playlist
-            mediaPlayer.setDataSource(audio[currentAudioIndex].absolutePath)
-
-            mediaPlayer.setOnCompletionListener {
-                val nextAudio = audio.getOrNull(currentAudioIndex+1)
-                if (nextAudio != null) {
-                    playNextSong()
-                } else {
-                    makeToast("Finished playlist")
-                    findViewById<ImageView>(R.id.currentSongStop).callOnClick()
-                }
+        mediaPlayer.setOnCompletionListener {
+            val nextAudio = audio.getOrNull(currentAudioIndex+1)
+            if (nextAudio != null) {
+                playNextSong()
+            } else {
+                makeToast("Finished playlist")
+                findViewById<ImageView>(R.id.currentSongStop).callOnClick()
             }
-
-            mediaPlayer.prepare()
-
-            val playbackParams = PlaybackParams()
-            playbackParams.speed = 1f
-
-            try {
-                mediaPlayer.playbackParams = playbackParams
-                mediaPlayer.setVolume(1f, 1f)
-            }
-            catch (e: Exception) { makeToast("${e.message.toString()}, $e") }
-
-            mediaPlayer.start()
-
-            editCurrentSongView(currentPlaylist, audio[0].name, nextSong)
-
-        } catch (e: Exception) {
-            makeToast("Error playing playlist: ${e.message}")
         }
+
+        mediaPlayer.prepare()
+
+        val playbackParams = PlaybackParams()
+        playbackParams.speed = 1f
+
+        mediaPlayer.playbackParams = playbackParams
+        mediaPlayer.setVolume(1f, 1f)
+
+
+        mediaPlayer.start()
+
+        editCurrentSongView(currentPlaylist, audio[0].name, nextSong)
     }
     fun playNextSong()  {
-        makeToast("Playing next song (${audio[currentAudioIndex + 1].nameWithoutExtension})")
         currentAudioIndex += 1
         val tryNextAudio = audio.getOrNull(currentAudioIndex+1)
         val nextSong = if (tryNextAudio != null) tryNextAudio.name else "None"
@@ -90,7 +73,6 @@ class PlaylistActivity : AppCompatActivity() {
         editCurrentSongView(currentPlaylist, audio[currentAudioIndex].name, nextSong)
     }
     fun playPreviousSong()  {
-        makeToast("Playing previous song (${audio[currentAudioIndex - 1].nameWithoutExtension})")
         val nextSong = audio[currentAudioIndex].name
         currentAudioIndex -= 1
         mediaPlayer.reset()
@@ -100,7 +82,6 @@ class PlaylistActivity : AppCompatActivity() {
         editCurrentSongView(currentPlaylist, audio[currentAudioIndex].name, nextSong)
     }
     fun pauseSong() {
-        makeToast("Playback paused")
         findViewById<ImageView>(R.id.currentSongPause).setImageDrawable(resources.getDrawable(R.drawable.play))
         mediaPlayer.pause()
     }
@@ -117,10 +98,9 @@ class PlaylistActivity : AppCompatActivity() {
 
             val params = mediaPlayer.playbackParams
             makeToast(params.speed.toString())
-            params.speed = params.speed - 0.25f // limit max speed if desired
+            params.speed = params.speed - 0.25f
             mediaPlayer.playbackParams = params
 
-            makeToast("Speed changed to ${mediaPlayer.playbackParams.speed}")
         }
     }
     fun speedSongUp() {
@@ -132,14 +112,12 @@ class PlaylistActivity : AppCompatActivity() {
 
             val params = mediaPlayer.playbackParams
             makeToast(params.speed.toString())
-            params.speed = params.speed + 0.25f // limit max speed if desired
+            params.speed = params.speed + 0.25f
             mediaPlayer.playbackParams = params
 
-            makeToast("Speed changed to ${mediaPlayer.playbackParams.speed}")
         }
     }
     fun fastForward() {
-        makeToast("Fast-forwarded 10 seconds")
 
         if (mediaPlayer.isPlaying) { unpauseSong() }
 
@@ -148,7 +126,6 @@ class PlaylistActivity : AppCompatActivity() {
 
     }
     fun rewind() {
-        makeToast("Rewound 10 seconds")
 
         if (mediaPlayer.isPlaying) { unpauseSong() }
 
@@ -157,20 +134,15 @@ class PlaylistActivity : AppCompatActivity() {
 
     }
     fun editCurrentSongView(playlist: File, song: String, nextSong: String) {
-        try {
-            val containerLayout = findViewById<LinearLayout>(R.id.currentSongContainer)
 
-            containerLayout.findViewById<TextView>(R.id.currentSong).text =
-                if (song.length < 12) song else song.substring(0, 12) + "..."
-            containerLayout.findViewById<TextView>(R.id.nextSong).text =
-                if (nextSong.length < 12) nextSong else nextSong.substring(0, 12) + "..."
-            containerLayout.findViewById<TextView>(R.id.currentPlaylist).text =
-                if (playlist.name.length < 12) playlist.name else playlist.name.substring(0, 12) + "..."
+        val containerLayout = findViewById<LinearLayout>(R.id.currentSongContainer)
 
-
-        } catch (e: Exception) {
-            makeToast(e.message.toString())
-        }
+        containerLayout.findViewById<TextView>(R.id.currentSong).text =
+            if (song.length < 12) song else song.substring(0, 12) + "..."
+        containerLayout.findViewById<TextView>(R.id.nextSong).text =
+            if (nextSong.length < 12) nextSong else nextSong.substring(0, 12) + "..."
+        containerLayout.findViewById<TextView>(R.id.currentPlaylist).text =
+            if (playlist.name.length < 12) playlist.name else playlist.name.substring(0, 12) + "..."
     }
     fun clickEffect(image: ImageView) {
         image.setColorFilter("#0000FF".toColorInt(), PorterDuff.Mode.SRC_ATOP)
@@ -182,75 +154,64 @@ class PlaylistActivity : AppCompatActivity() {
             val progress = animation.animatedValue as Float
 
             val alpha = (progress * 128).toInt()
-            val color = Color.argb(alpha, 255, 0, 0) // red with varying transparency
+            val color = Color.argb(alpha, 255, 0, 0)
             image.setColorFilter(color, PorterDuff.Mode.SRC_ATOP)
         }
 
         animator.start()
     }
     fun addClickListeners() {
-        try {
-            findViewById<ImageView>(R.id.currentSongStop).setOnClickListener {
-                startActivity(Intent(this, MyPlaylistsActivity::class.java))
-                mediaPlayer.release()
-            }
-            findViewById<ImageView>(R.id.currentSongPause).setOnClickListener {
-                clickEffect(it as ImageView)
-                if (mediaPlayer.isPlaying) {
-                    makeToast("Playback paused")
-                    pauseSong()
-                } else {
-                    makeToast("Playback resumed")
-                    unpauseSong()
-                }
-            }
-            findViewById<ImageView>(R.id.playNextSong).setOnClickListener {
 
-                if (mediaPlayer.isPlaying) {
-                    unpauseSong()
-                }
-                if (currentAudioIndex < (audio.count() - 1)) {
-                    clickEffect(it as ImageView)
-                    playNextSong()
-                }
-            }
-            findViewById<ImageView>(R.id.playPrevSong).setOnClickListener {
-
-                if (mediaPlayer.isPlaying) {
-                    unpauseSong()
-                }
-                if (currentAudioIndex > 0) {
-                    clickEffect(it as ImageView)
-                    playPreviousSong()
-                }
-            }
-            findViewById<ImageView>(R.id.speedUp).setOnClickListener {
-                try {
-                    clickEffect(it as ImageView)
-                    speedSongUp()
-                } catch (e: Exception) {
-                    makeToast(e.message.toString())
-                }
-            }
-            findViewById<ImageView>(R.id.slowDown).setOnClickListener {
-                try {
-                    clickEffect(it as ImageView)
-                    slowSongDown()
-                } catch (e: Exception) {
-                    makeToast(e.message.toString())
-                }
-            }
-            findViewById<ImageView>(R.id.fastForward).setOnClickListener {
-                clickEffect(it as ImageView)
-                fastForward()
-            }
-            findViewById<ImageView>(R.id.rewind).setOnClickListener {
-                clickEffect(it as ImageView)
-                rewind()
+        findViewById<ImageView>(R.id.currentSongStop).setOnClickListener {
+            startActivity(Intent(this, MyPlaylistsActivity::class.java))
+            mediaPlayer.release()
+        }
+        findViewById<ImageView>(R.id.currentSongPause).setOnClickListener {
+            clickEffect(it as ImageView)
+            if (mediaPlayer.isPlaying) {
+                pauseSong()
+            } else {
+                unpauseSong()
             }
         }
-        catch (e: Exception) { makeToast(e.message.toString()) }
+        findViewById<ImageView>(R.id.playNextSong).setOnClickListener {
+
+            if (mediaPlayer.isPlaying) {
+                unpauseSong()
+            }
+            if (currentAudioIndex < (audio.count() - 1)) {
+                clickEffect(it as ImageView)
+                playNextSong()
+            }
+        }
+        findViewById<ImageView>(R.id.playPrevSong).setOnClickListener {
+
+            if (mediaPlayer.isPlaying) {
+                unpauseSong()
+            }
+            if (currentAudioIndex > 0) {
+                clickEffect(it as ImageView)
+                playPreviousSong()
+            }
+        }
+        findViewById<ImageView>(R.id.speedUp).setOnClickListener {
+            clickEffect(it as ImageView)
+            speedSongUp()
+        }
+        findViewById<ImageView>(R.id.slowDown).setOnClickListener {
+            clickEffect(it as ImageView)
+            slowSongDown()
+        }
+        findViewById<ImageView>(R.id.fastForward).setOnClickListener {
+            clickEffect(it as ImageView)
+            fastForward()
+        }
+        findViewById<ImageView>(R.id.rewind).setOnClickListener {
+            clickEffect(it as ImageView)
+            rewind()
+        }
     }
+
     fun makeToast(msg: String) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
@@ -271,11 +232,8 @@ class PlaylistActivity : AppCompatActivity() {
         }
 
         currentPlaylist = intent.getSerializableExtra("playlist") as File
-        val serializable = intent.getSerializableExtra("audio")!!
-        if (serializable is ArrayList<*>) {
-            serializable.forEach {
-                audio.add(it as File)
-            }
+        JSON.getSongsOrdered(currentPlaylist).forEach {
+            audio.add(File(currentPlaylist, it))
         }
 
         addClickListeners()

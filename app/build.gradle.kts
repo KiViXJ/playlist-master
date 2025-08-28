@@ -36,7 +36,7 @@ android {
 }
 
 dependencies {
-    implementation("com.github.maxrave-dev:kotlin-youtubeExtractor:0.0.7")
+    implementation("com.google.code.gson:gson:2.13.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

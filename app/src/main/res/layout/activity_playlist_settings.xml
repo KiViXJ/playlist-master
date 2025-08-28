@@ -34,11 +34,32 @@
             android:maxLines="2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/saveButtonM"
+            android:layout_width="500px"
+            android:layout_height="200px"
+            android:background="@drawable/button"
+            android:text="Save"
+            android:textSize="90px"
+            android:layout_marginTop="150px"
+            android:fontFamily="@font/montserrat_bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/deleteButtonM"
+            android:layout_width="500px"
+            android:layout_height="200px"
+            android:background="@drawable/button_red"
+            android:text="Delete"
+            android:textSize="90px"
+            android:layout_marginTop="75px"
+            android:fontFamily="@font/montserrat_bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="200px"
+            android:layout_marginTop="100px"
             android:fontFamily="@font/montserrat_bold"
             android:text="Audio"
             android:ellipsize="end"
@@ -80,25 +101,8 @@
             app:layout_constraintStart_toStartOf="parent" />
 
 
+
     </LinearLayout>
     </ScrollView>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="bottom|center"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/saveButtonM"
-            android:layout_width="500px"
-            android:layout_height="200px"
-            android:background="@drawable/button"
-            android:text="Save"
-            android:textSize="90px"
-            android:fontFamily="@font/montserrat_bold"
-            android:layout_marginBottom="50px"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

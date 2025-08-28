@@ -2,17 +2,11 @@ package com.example.playlistmaster
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.PorterDuff
-import android.graphics.drawable.GradientDrawable
-import android.icu.text.ListFormatter
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.TypedValue
 import android.view.Gravity
-import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.ImageView
@@ -24,12 +18,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.toColor
-import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.children
-import androidx.core.view.setPadding
+import com.google.gson.Gson
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -38,14 +29,12 @@ class NewPlaylistActivity : AppCompatActivity() {
     lateinit var addedAudioView: LinearLayout
     val addedAudioNameXUri = mutableMapOf<String, Uri>()
 
-    val wrap = LinearLayout.LayoutParams.WRAP_CONTENT
-    val match = LinearLayout.LayoutParams.MATCH_PARENT
     fun makeToast(msg: String) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
     @SuppressLint("ResourceAsColor")
-    fun addNewAudioText(name: String, uri: Uri) {
+    fun createAudioView(name: String, uri: Uri) {
 
         if (addedAudioNameXUri.contains(name)) {
             return makeToast("This audio is already added")
@@ -107,7 +96,6 @@ class NewPlaylistActivity : AppCompatActivity() {
                 gravity = Gravity.CENTER or Gravity.END
                 rightMargin = 10
             }
-
             setImageResource(R.drawable.trash_can)
         }
 
@@ -134,6 +122,7 @@ class NewPlaylistActivity : AppCompatActivity() {
         }
         return filePath
     }
+
     fun trySavePlaylist() {
 
         val title = findViewById<EditText>(R.id.newPlaylistTitle).text.toString()
@@ -152,26 +141,29 @@ class NewPlaylistActivity : AppCompatActivity() {
         makeToast("Successfully created playlist '$title'")
         playlistDirectory.mkdirs()
 
+        val gson = Gson()
+        val data = mutableListOf<String>()
+        val songOrderFile = File(playlistDirectory, "songOrder.json")
+        songOrderFile.createNewFile()
+
         for ((name, uri) in addedAudioNameXUri) {
-            try {
-                val inputStream: InputStream? = contentResolver.openInputStream(uri)
-                if (inputStream != null) {
+            val inputStream: InputStream? = contentResolver.openInputStream(uri)
+            if (inputStream != null) {
 
-                    val copiedFile = File(playlistDirectory, name)
+                val copiedFile = File(playlistDirectory, name)
 
-                    FileOutputStream(copiedFile).use { output ->
-                        inputStream.copyTo(output)
-                    }
-                    inputStream.close()
-
+                FileOutputStream(copiedFile).use { output ->
+                    inputStream.copyTo(output)
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
+                inputStream.close()
+
+                data.add(copiedFile.name)
             }
         }
 
-        startActivity(Intent(this, MainActivity::class.java))
+        songOrderFile.writeText(gson.toJson(data))
 
+        startActivity(Intent(this, MyPlaylistsActivity::class.java))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,8 +179,10 @@ class NewPlaylistActivity : AppCompatActivity() {
 
         addedAudioView = findViewById(R.id.addedAudio)
 
-        var chooseFile = Intent(Intent.ACTION_OPEN_DOCUMENT)
-        chooseFile.setType("audio/*")
+        var chooseFile = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            type = "audio/*"
+        }
         chooseFile = Intent.createChooser(chooseFile, "Choose an audio file")
 
         findViewById<AppCompatButton>(R.id.newPlaylistAddSong).setOnClickListener {
@@ -199,6 +193,7 @@ class NewPlaylistActivity : AppCompatActivity() {
         }
 
     }
+
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
@@ -206,9 +201,18 @@ class NewPlaylistActivity : AppCompatActivity() {
     ) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 100) {
-            val uri: Uri = data!!.data!!
-            val name = getNameFromUri(uri)!!
-            addNewAudioText(name, uri)
+            data.let { intentData ->
+                if (intentData!!.clipData != null) {
+                    val count = intentData.clipData!!.itemCount
+                    for (i in 0 until count) {
+                        val uri = intentData.clipData!!.getItemAt(i).uri
+                        createAudioView(getNameFromUri(uri)!!, uri)
+                    }
+                } else if (intentData.data != null) { // Single file selected
+                    val uri = intentData.data!!
+                    createAudioView(getNameFromUri(uri)!!, uri)
+                }
+            }
         }
     }
 }
